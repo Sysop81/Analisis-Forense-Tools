@@ -21,7 +21,7 @@ class Display:
 
     @staticmethod
     def show_banner():
-        print(f"{Display.GREEN}{(pyfiglet.figlet_format(Display.PROGRAM_NAME, font="cybermedium")).strip()}{Display.RESET}")
+        print(f"{Display.GREEN}{(pyfiglet.figlet_format(Display.PROGRAM_NAME, font="doom")).strip()}{Display.RESET}")
         Display.show_description()
 
     @staticmethod
