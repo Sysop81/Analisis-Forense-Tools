@@ -45,4 +45,30 @@ class Display:
 
     @staticmethod
     def print_color_text(text, color):
-        return f"{color}{text}{Display.RESET}"    
+        return f"{color}{text}{Display.RESET}"
+
+    @staticmethod
+    def show_input_question(text,color = None) -> bool:
+        if color == None : color = Display.GREY # [Yes/No]
+        question = (f"{Display.print_color_text(text,color)}"
+                   f" [{Display.print_color_text("Y",Display.GREEN)}es] or [{Display.print_color_text("N",Display.RED)}o]") 
+        #res = input(question)
+        while True:
+            res = input(question)
+            if res.lower() in ("yes","y"):
+                return True
+            elif res.lower() in("no","n"):
+                Display.show_info(F"Remember. To run {Display.print_color_text(Display.PROGRAM_NAME,Display.YELLOW)} you must launch it in a console with administrator privileges.")
+                return False
+            else:
+                question = f"Please type {Display.print_color_text("Y",Display.GREEN)}es or {Display.print_color_text("N",Display.RED)}o."
+    
+    @staticmethod
+    def get_user_answer() -> bool:
+        Display.show_warning(f"{Display.PROGRAM_NAME} requires administrator privileges.")
+        return Display.show_input_question("Do you want to run the program with administrator privileges?")
+
+    @staticmethod
+    def show_end_program(code : int = 0):
+        print(f"{Display.RED}End program{Display.RESET}")
+        exit(code)

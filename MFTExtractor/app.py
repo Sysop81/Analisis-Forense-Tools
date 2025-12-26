@@ -8,12 +8,13 @@ GitHub: github.com/Sysop81
 
 from display.dhandler import Display
 from params.params_handler import Parameters
-
+from helpers.privileges import Privileges
 
 def main():
     Display.show_banner()
     params = Parameters() 
     
-    print(params.get_params())
+    Privileges.check_privileges(params.get_command_line_args())    
 
+    
     Display.show_info("End program")    
