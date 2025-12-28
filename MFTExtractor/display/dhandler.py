@@ -49,10 +49,10 @@ class Display:
 
     @staticmethod
     def show_input_question(text,color = None) -> bool:
-        if color == None : color = Display.GREY # [Yes/No]
+        if color == None : color = Display.GREY
         question = (f"{Display.print_color_text(text,color)}"
                    f" [{Display.print_color_text("Y",Display.GREEN)}es] or [{Display.print_color_text("N",Display.RED)}o]") 
-        #res = input(question)
+        
         while True:
             res = input(question)
             if res.lower() in ("yes","y"):
@@ -72,3 +72,8 @@ class Display:
     def show_end_program(code : int = 0):
         print(f"{Display.RED}End program{Display.RESET}")
         exit(code)
+
+    @staticmethod
+    def show_ntfs_info(ntfs_info : dict):
+        for key,value in ntfs_info.items():
+            print(f"{Display.print_color_text(key,Display.YELLOW)}: {Display.print_color_text(value,Display.GREY)}")    

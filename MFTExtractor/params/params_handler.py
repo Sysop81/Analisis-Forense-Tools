@@ -11,6 +11,21 @@ class Parameters:
         self.args = self.parser.parse_args()
         self.validate_params()
 
+    def get_params(self) -> dict:
+         return {
+             "input"  : Utils.get_volume_letter(self.args.i),
+             "output" : Utils.get_output_file_name(self.args.o) 
+         }
+    
+    def get_input(self):
+        return self.input
+    
+    def get_output(self):
+        return self.output
+    
+    def get_command_line_args(self):
+        return " ".join(sys.argv)
+    
     def add_params(self):
         self.parser.add_argument("-i",
                                 metavar="<VOL_LETTER>", 
@@ -21,16 +36,7 @@ class Parameters:
                                 metavar="<NEW_NAME.bin>", 
                                 default="MFT.bin",
                                 help=f"Output file. To change default name use [{Display.print_color_text('Example:',Display.CYAN)} {Display.GREY} {Display.PROGRAM_NAME} -o <new_name.bin>{Display.RESET}]"
-        )       
-
-    def get_params(self) -> dict:
-         return {
-             "input"  : Utils.get_volume_letter(self.args.i),
-             "output" : Utils.get_output_file_name(self.args.o) 
-         }
-    
-    def get_command_line_args(self):
-        return " ".join(sys.argv)
+        ) 
 
     def validate_params(self):
         
@@ -41,3 +47,9 @@ class Parameters:
         if not Utils.is_correct_file_name(self.args.o):
             Display.show_error(f" Wrong output the file name. {Display.GREY}Only letters, the symbol \"_\" and THE \".bin\" extension are allowed{Display.RESET}")
             Display.show_end_program(1)
+
+        self.build_params()    
+
+    def build_params(self) -> dict:
+        self.input  = Utils.get_volume_letter(self.args.i)
+        self.output = Utils.get_output_file_name(self.args.o)   

@@ -27,6 +27,9 @@ INVALID_HANDLE_VALUE = wintypes.HANDLE(-1).value
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 shell32 = ctypes.WinDLL("shell32", use_last_error=True)
 
+# Size of a File record segment in NTFS
+RECORD_SIZE = 1024
+
 # NTFS Struct
 # Map the NTFS_VOLUME_DATA_BUFFER returned by FSCTL_GET_NTFS_VOLUME_DATA
 # This struct contains metadata about NTFS volume (size, location..)
@@ -48,3 +51,25 @@ class NTFS_VOLUME_DATA_BUFFER(ctypes.Structure):
         ("MftZoneStart", wintypes.LARGE_INTEGER),           # Start of the MFT zone 
         ("MftZoneEnd", wintypes.LARGE_INTEGER),             # End of the MFT zone
     ]
+"""
+    Method get_ntfs_info
+    Gets information about the NTFS volume given a valid identifier (handle).
+    Returns an NTFS_VOLUME_DATA_BUFFER structure containing volume metadata (size, clusters, MFT, etc.). 
+    Resource. https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-deviceiocontrol
+"""
+def get_ntfs_info(handle) -> NTFS_VOLUME_DATA_BUFFER:
+    ntfs_info = NTFS_VOLUME_DATA_BUFFER()
+    bytes_returned = wintypes.DWORD()
+    is_ok = kernel32.DeviceIoControl(
+        handle,
+        FSCTL_GET_NTFS_VOLUME_DATA,
+        None,
+        0,
+        ctypes.byref(ntfs_info),
+        ctypes.sizeof(ntfs_info),
+        ctypes.byref(bytes_returned),
+        None
+    )
+    if not is_ok:
+        raise OSError("Fail handle FSCTL_GET_NTFS_VOLUME_DATA")
+    return ntfs_info
