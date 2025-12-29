@@ -38,7 +38,7 @@ class NTFS_VOLUME_DATA_BUFFER(ctypes.Structure):
     _fields_ = [
         ("VolumeSerialNumber", wintypes.LARGE_INTEGER),     # Serial number of the volume
         ("NumberSectors", wintypes.LARGE_INTEGER),          # Total number of sectors on the volume
-        ("TotalClusters", wintypes.LARGE_INTEGER),          # Total number of clusters "
+        ("TotalClusters", wintypes.LARGE_INTEGER),          # Total number of clusters
         ("FreeClusters", wintypes.LARGE_INTEGER),           # Number of free clusters  
         ("TotalReserved", wintypes.LARGE_INTEGER),          # Number of the reserved clusters
         ("BytesPerSector", wintypes.DWORD),                 # Number of bytes per sector
