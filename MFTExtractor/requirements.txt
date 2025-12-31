@@ -1,0 +1,4 @@
+# Python >= 3.13.7
+
+pyfiglet>=1.0.4
+tqdm>=4.67.1
