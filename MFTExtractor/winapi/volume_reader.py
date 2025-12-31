@@ -1,5 +1,6 @@
 import ctypes
 from ctypes import wintypes
+from tqdm import tqdm
 from display.dhandler import Display
 from winapi.ntfs import (kernel32,get_ntfs_info,GENERIC_READ,FILE_SHARE_READ,FILE_SHARE_WRITE,
     OPEN_EXISTING,INVALID_HANDLE_VALUE,RECORD_SIZE)
@@ -44,7 +45,7 @@ class VolumeReader:
         kernel32.CloseHandle(self.handle)
 
     def get_ntfs_info(self):
-        Display.show_info(" Getting NTFS information...")
+        Display.show_info(" Getting MFT Information...")
         try:
             self.ntfs_info = get_ntfs_info(self.handle)
             Display.show_ntfs_info(self.build_display_info())
@@ -84,6 +85,15 @@ class VolumeReader:
         max_bytes_per_read = RECORD_SIZE * RECORD_SIZE    # 1MB to read bytes in each loop interaction
         rounded_mft_size = self.rounded_mft_size
 
+        progress_bar = tqdm(
+            total = rounded_mft_size,
+            desc = f"{Display.print_color_text("Reading MFT",Display.YELLOW)}",
+            unit="B",
+            unit_scale=True,
+            dynamic_ncols = True,
+            colour = "GREEN"
+        )
+
         while rounded_mft_size > 0:
             # Bytes to read in each loop
             bytes_to_read = min(self.rounded_mft_size,max_bytes_per_read)
@@ -109,7 +119,11 @@ class VolumeReader:
             # Add reading bytes to the complete buffer & subtract the bytes read from the remaining size
             self.complete_mft_buffer += buffer.raw[:read.value]
             rounded_mft_size -= read.value
+
+            # Update progress bar
+            progress_bar.update(read.value)
         
+        progress_bar.close()
         self.close_handle()
 
     def build_display_info(self):
@@ -120,11 +134,14 @@ class VolumeReader:
         # so that complete records are read without truncating data
         self.rounded_mft_size = (mft_size + RECORD_SIZE - 1) // RECORD_SIZE * RECORD_SIZE
         
+        # Calculate MFT Offset
+        mftoffset = self.ntfs_info.MftStartLcn * self.ntfs_info.BytesPerCluster
+
         return {
-            "Bytes per cluster" : f"{self.ntfs_info.BytesPerCluster} bytes",
-            "MFT LCN" : f"{self.ntfs_info.MftStartLcn} cluster",
-            "MFT size": f'{self.rounded_mft_size} bytes',
-            "MFT offset" : f"{self.ntfs_info.MftStartLcn * self.ntfs_info.BytesPerCluster} bytes" 
+            "Bytes per cluster" : [f"{self.ntfs_info.BytesPerCluster} bytes",f"{self.ntfs_info.BytesPerCluster / RECORD_SIZE} KB"],
+            "MFT Start LCN    " : [f"{self.ntfs_info.MftStartLcn} cluster",f"{self.ntfs_info.MftStartLcn} cluster * {self.ntfs_info.BytesPerCluster} bytes"],
+            "MFT size         " : [f"{self.rounded_mft_size} bytes",f"{self.rounded_mft_size / (RECORD_SIZE * RECORD_SIZE)} MB"],
+            "MFT offset       " : [f"{mftoffset} bytes",f"{mftoffset / (RECORD_SIZE * RECORD_SIZE)} MB"] 
         }
 
     

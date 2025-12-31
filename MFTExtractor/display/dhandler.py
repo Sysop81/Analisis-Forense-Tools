@@ -70,10 +70,49 @@ class Display:
 
     @staticmethod
     def show_end_program(code : int = 0):
-        print(f"{Display.RED}End program{Display.RESET}")
+        msg = f"{Display.GREEN} Program finished successfully{Display.RESET}"    
+        if code != 0:
+            msg =  f"{Display.RED} Program finished with errors{Display.RESET}" 
+
+        print(f"{Display.CYAN}[Info]{Display.RESET}{msg}")
         exit(code)
 
     @staticmethod
     def show_ntfs_info(ntfs_info : dict):
-        for key,value in ntfs_info.items():
-            print(f"{Display.print_color_text(key,Display.YELLOW)}: {Display.print_color_text(value,Display.GREY)}")    
+        
+        max_key_length =  max(len(key) for key in ntfs_info.keys())
+        max_value_length =  max(len(str(value)) for value in ntfs_info.values())
+        total = (max_key_length + max_value_length) + 5
+        
+        UPPER_LEFT = '\u250c'
+        UPPER_RIGHT = '\u2510'
+        LOWER_LEFT = '\u2514'
+        LOWER_RIGTH = '\u2518'
+        HORIZONTAL = '\u2500'
+        VERTICAL = '|'
+
+        # Header
+        print(f"\n\t{Display.build_separator(total,HORIZONTAL,UPPER_LEFT,UPPER_RIGHT)}")
+        print("\t|{:<{}} | {:<{}}|".format("Metadata", max_key_length, "Values", (max_value_length + 2)))
+        print(f"\t{Display.build_separator(total,HORIZONTAL,VERTICAL,VERTICAL)}")
+
+        # Body
+        for index,(key,value) in enumerate(ntfs_info.items()):
+            print(f"\t|{Display.print_color_text(key,Display.YELLOW)} | {Display.print_color_text(Display.build_mft_values(value,max_value_length),Display.GREY)} |")
+             
+            if index < len(ntfs_info) - 1:
+                print(f"\t{Display.build_separator(total,HORIZONTAL,VERTICAL,VERTICAL)}")
+        # Footer    
+        print(f"\t{Display.build_separator(total,HORIZONTAL,LOWER_LEFT,LOWER_RIGTH)}\n")            
+                 
+
+    @staticmethod
+    def build_separator(value : int, separator : str,start : str,end : str)-> str:
+        return f"{start}{separator * value}{end}"        
+
+    @staticmethod
+    def build_mft_values(values : list, max_length : int):
+       str_value = str(values)
+       diff = max_length - (len(str_value) - 1)
+       
+       return str_value + (" " * diff)           

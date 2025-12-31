@@ -32,4 +32,4 @@ def main():
         ntfs_volume.complete_mft_buffer
     )
     
-    Display.show_info("End program")    
+    Display.show_end_program(0)   
