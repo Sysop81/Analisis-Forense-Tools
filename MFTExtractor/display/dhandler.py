@@ -1,16 +1,17 @@
 import pyfiglet
+from colorama import init, Fore, Style
 
 class Display:
      # Basic colors
-    RED = "\033[31m"
-    GREEN = "\033[32m"
-    GREY = "\033[90m"
-    YELLOW = "\033[33m"
-    BLUE = "\033[34m"
-    MAGENTA = "\033[35m"
-    CYAN = "\033[36m"
-    WHITE = "\033[97m"
-    RESET = "\033[0m"
+    RED = Fore.RED
+    GREEN = Fore.GREEN
+    GREY = Fore.LIGHTBLACK_EX
+    YELLOW = Fore.YELLOW
+    BLUE = Fore.BLUE
+    MAGENTA = Fore.MAGENTA
+    CYAN = Fore.CYAN
+    WHITE = Fore.WHITE
+    RESET = Style.RESET_ALL
 
     # Program info
     PROGRAM_NAME = "MFTExtractor"
@@ -21,6 +22,7 @@ class Display:
 
     @staticmethod
     def show_banner():
+        init()
         print(f"{Display.GREEN}{(pyfiglet.figlet_format(Display.PROGRAM_NAME, font="doom")).strip()}{Display.RESET}")
         Display.show_description()
 

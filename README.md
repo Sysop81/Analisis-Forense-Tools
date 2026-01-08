@@ -19,6 +19,7 @@ Tools developed for the Forensic Analysis module of the professional training ma
 
     # Finally into the folder app create a virtual environment and install dependencies
 ```
+<!--
 All tools with command-line output use color coding. Development and testing were performed using __PowerShell 5.1.26100.7462__. By default, color coding is disabled (ANSI support) in the console with administrator privileges.
 
 **To activate it run:**
@@ -29,7 +30,7 @@ All tools with command-line output use color coding. Development and testing wer
     # Close and reopen PowerShell (as Administrator).
     
 ```
-
+-->
 
 ## NTFS
 - __MFTExtractor__. It is a tool for reading and extracting the Master File Table __(MFT)__ in an NTFS file system.

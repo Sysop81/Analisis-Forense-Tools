@@ -2,3 +2,4 @@
 
 pyfiglet>=1.0.4
 tqdm>=4.67.1
+colorama>=0.4.6
