@@ -1,6 +1,8 @@
 import struct
+from tqdm import tqdm
 from models.parsed_mft_record import ParsedMFTRecord
 from helpers.tools import Utils
+from display.dhandler import Display
 
 class MFTParser:
     
@@ -222,6 +224,13 @@ class MFTParser:
     
     def build_paths(self) -> None:
         ref_map = {r.mft_reference: r for r in self.parsed_record_list}
+        progress_bar = tqdm(
+            total = len(self.parsed_record_list),
+            desc = f"{Display.print_color_text('Processing PATHs',Display.YELLOW)}",
+            unit="records",
+            dynamic_ncols = True,
+            colour = "GREEN"
+        )
 
         for record in self.parsed_record_list:
             current = record.mft_reference
@@ -262,5 +271,10 @@ class MFTParser:
             # build fianl Parent PATH 
             record.path = "\\".join(reversed(path_parts))
             if not record.path.startswith("."):
-                record.path = ".\\" + record.path 
+                record.path = ".\\" + record.path
+
+            # Update progress bar
+            progress_bar.update(1)    
+        progress_bar.set_postfix_str(Display.print_color_text("Done",Display.GREEN), refresh=True)
+        progress_bar.close()         
             

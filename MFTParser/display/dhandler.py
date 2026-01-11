@@ -47,6 +47,10 @@ class Display:
         print(f"{Display.RED}[Error]{Display.RESET}{text}")         
 
     @staticmethod
+    def show_text(text : str):
+        print(text)
+    
+    @staticmethod
     def print_color_text(text, color):
         return f"{color}{text}{Display.RESET}"
 

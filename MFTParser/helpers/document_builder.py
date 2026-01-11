@@ -1,7 +1,9 @@
 from models.parsed_mft_record import ParsedMFTRecord 
 from helpers.tools import Utils
+from display.dhandler import Display
 from openpyxl import Workbook
 import pandas as pd
+from tqdm import tqdm
 
 class DocumentBuilder:
 
@@ -18,8 +20,16 @@ class DocumentBuilder:
         self.file_type = _file_type
         self.file_path = Utils.build_output_path(self.file_name, self.file_type)
         self.parsed_records = _parsed_record_list
+        self.progress_bar = tqdm(
+            total = len(self.parsed_records),
+            desc = f"{Display.print_color_text('Processing output file',Display.YELLOW)}",
+            unit="records",
+            dynamic_ncols = True,
+            colour = "GREEN",
+        )
 
     def build_document(self):
+        
         if self.file_type in (".csv", "csv"):
             self.build_csv()
             return
@@ -56,13 +66,32 @@ class DocumentBuilder:
                     record_data._0x30MFTModification,
                     record_data._0x30Access
                 ])
-        
+            self.progress_bar.update(1)
+            
+        self.progress_bar.set_postfix_str(Display.print_color_text("Saving file...",Display.YELLOW), refresh=True)
         wb.save(self.file_path)
-        print(f"Excel file builded: {self.file_path}")  
 
+        self.close_progress_bar()
+    
     def build_csv(self) -> None:
-        df = pd.DataFrame(
-            [record.to_dict() for record in self.parsed_records if record is not None]
+        records = []
+
+        for record in self.parsed_records:
+            if record is None:
+                continue
+
+            records.append(record.to_dict())
+            self.progress_bar.update(1)
+
+        df = pd.DataFrame(records)
+        df.to_csv(self.file_path, index=False, encoding="utf-8-sig")
+        
+        self.close_progress_bar()
+
+    def close_progress_bar(self)-> None:
+        self.progress_bar.set_postfix_str(Display.print_color_text("Done",Display.GREEN), refresh=True)
+        self.progress_bar.close()
+        tqdm.write(
+            f"{Display.print_color_text(self.file_type.upper(), Display.RED)} file built: "
+            f"{Display.print_color_text(self.file_path, Display.GREY)}"
         )
-        df.to_csv(self.file_path, index=False, encoding='utf-8-sig')
-        print(f"CSV file builded: {self.file_path}")  
