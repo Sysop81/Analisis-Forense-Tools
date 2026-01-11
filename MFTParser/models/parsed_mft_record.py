@@ -5,19 +5,20 @@ class ParsedMFTRecord:
     ATTR_DATA = 0x80
 
     def __init__(self):
-        self.entry_number = None
-        self.sequence_number = None
-        self.mft_reference = None
-        self.parent_mft_reference = None
-        self.file_name_short = None
-        self.file_name_large = None
-        self.path = None
-        self.IsDirectory = None
-        self.IsHidden = None
-        self.IsSystem = None
-        self.IsReadOnly = None
-        self.IsADS = None
-        self.ADSFiles = None
+        self._entry_number = None
+        self._sequence_number = None
+        self._mft_reference = None
+        self._parent_mft_reference = None
+        self._name_type = None
+        self._file_name_short = None
+        self._file_name_large = None
+        self._path = None
+        self._IsDirectory = None
+        self._IsHidden = None
+        self._IsSystem = None
+        self._IsReadOnly = None
+        self._IsADS = None
+        self._ADSFiles = None
         self._0x10Creation = None
         self._0x10Modification = None
         self._0x10MFTModification = None
@@ -61,6 +62,15 @@ class ParsedMFTRecord:
         self._parent_mft_reference = value    
 
     # --- Path && file names ---
+    
+    @property
+    def name_type(self):
+        return self._name_type
+
+    @name_type.setter
+    def name_type(self, value):
+        self._name_type = value
+
     @property
     def file_name_short(self):
         return self._file_name_short
@@ -200,12 +210,39 @@ class ParsedMFTRecord:
     def file_name_access(self, value):
         self._0x30Access = value
 
+    def to_dict(self):
+        return {
+            "entry_number": self._entry_number,
+            "sequence_number": self._sequence_number,
+            "mft_reference": self._mft_reference,
+            "parent_mft_reference": self._parent_mft_reference,
+            "name_type": self._name_type,
+            "file_name_short": self._file_name_short,
+            "file_name_large": self._file_name_large,
+            "path": self._path,
+            "IsDirectory": self._IsDirectory,
+            "IsHidden": self._IsHidden,
+            "IsSystem": self._IsSystem,
+            "IsReadOnly": self._IsReadOnly,
+            "ContainsADS": self._IsADS,
+            "ADSFiles": self._ADSFiles,
+            "0x10Creation": self._0x10Creation,
+            "0x10Modification": self._0x10Modification,
+            "0x10MFTModification": self._0x10MFTModification,
+            "0x10Access": self._0x10Access,
+            "0x30Creation": self._0x30Creation,
+            "0x30Modification": self._0x30Modification,
+            "0x30MFTModification": self._0x30MFTModification,
+            "0x30Access": self._0x30Access,
+        }    
+
     def __str__(self):
         return (
             f"ParsedMFTRecord(entry_number={self.entry_number}, "
             f"sequence_number={self.sequence_number}, "
             f"mft_reference={self.mft_reference}, "
             f"parent_mft_reference={self.parent_mft_reference}, "
+            f"name_type={self.name_type}, "
             f"file_name_short='{self.file_name_short}', "
             f"file_name_large='{self.file_name_large}', "
             f"path='{self.path}', "
