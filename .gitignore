@@ -208,5 +208,9 @@ __marimo__/
 
 # test folder
 **/test/
+
+# Otuput folder
+**/output/*
+
 # Other Tools
 MFTReader/
