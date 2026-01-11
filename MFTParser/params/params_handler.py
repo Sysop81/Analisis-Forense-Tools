@@ -1,5 +1,4 @@
 import argparse
-import sys
 from helpers.tools import Utils
 from display.dhandler import Display
 

@@ -1,10 +1,20 @@
 import re
 import os
 from datetime import datetime, timedelta
+from pathlib import Path
 
 class Utils:
 
     # Validator
+
+    NON_PRINTABLE_RE = re.compile(r'[\x00-\x08\x0B\x0C\x0E-\x1F]')
+    ALLOWED_CHARS_RE = re.compile(r'[^a-zA-Z0-9 _\.\-\\]')
+
+    @staticmethod
+    def has_non_printable_chars(text):
+        if not isinstance(text, str):
+            return False
+        return bool(Utils.NON_PRINTABLE_RE.search(text))
 
     @staticmethod
     def is_correct_file_name(file_name : str) -> bool:
@@ -34,4 +44,17 @@ class Utils:
     @staticmethod
     def clean_string(s):
      return "".join(c if c.isprintable() else "_" for c in s)
+    
+    # Folders
+
+    @staticmethod
+    def build_output_path(file_name : str, file_type : str) -> Path:
+        output_folder = "output"
+        output_path = Path(__file__).resolve().parents[1] / output_folder
+        output_path.mkdir(parents=True, exist_ok=True)
+        
+        if not file_type.startswith("."):
+            file_type = f".{file_type}"
+        
+        return output_path / f"{file_name}{file_type}"
     
