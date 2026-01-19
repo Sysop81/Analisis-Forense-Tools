@@ -70,3 +70,36 @@ All tools with command-line output use color coding. Development and testing wer
     |----|------------|
     |__file_name.bin__| File containing the extracted MFT content|
     |__file_name.txt__| File containing the program description, date, time, and MD5 and SHA 256 hashes|    
+
+- __MFTParser__. This tool parses MFT attributes data from a binary MFT file and exports it to Excel or CSV.
+    - __Program installation__
+    ```powershell
+    # [IMPORTANT] Go inside the root directory of MFTParser
+
+    # we create a virtual environment where we will install the necessary libraries. 
+    python -m venv venv
+
+    # Windows powershell
+    venv\Scripts\activate
+
+    # Install dependencies
+    pip install -r requirements.txt
+
+    ```
+    - __Usage:__
+
+    ```powershell
+    # Launch app with default values
+    python MFTParser.py
+
+    # Show help
+    python MFTParser.py -h
+
+    # Use personalized values
+    # -i MY_MFT.bin . [Input value] To use a file named MY_MFT.bin . By default uses MFT.bin
+    # -filename . File name output. By default uses MFT_parser
+    # -filetype . File type extensión [Only xlsx or csv]. By default uses xlsx
+    python MFTParser.py -i MY_MFT.bin -filename my_parsed_mft -filetype csv
+    ```
+
+- __MFTReader__. This tool show the content of the attributes of a record stored in the MFT.
