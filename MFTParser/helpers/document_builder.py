@@ -12,7 +12,8 @@ class DocumentBuilder:
         "NameType","Path","FileNameShort", "FileNameLarge", 
         "IsDirectory","IsHidden","IsSystem","IsReadOnly","ContainsADS","ADSFiles",
         "0x10Creation", "0x10Modification", "0x10MFTModification", "0x10Access",
-        "0x30Creation", "0x30Modification", "0x30MFTModification", "0x30Access"
+        "0x30Creation", "0x30Modification", "0x30MFTModification", "0x30Access",
+        "TstompingScore"
     ]
 
     def __init__(self, _parsed_record_list : list[ParsedMFTRecord],  _file_name: str, _file_type : str):
@@ -64,7 +65,8 @@ class DocumentBuilder:
                     record_data._0x30Creation,
                     record_data._0x30Modification,
                     record_data._0x30MFTModification,
-                    record_data._0x30Access
+                    record_data._0x30Access,
+                    record_data.timestomping_score
                 ])
             self.progress_bar.update(1)
             

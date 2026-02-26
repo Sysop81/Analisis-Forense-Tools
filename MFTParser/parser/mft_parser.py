@@ -1,5 +1,6 @@
 import struct
 from tqdm import tqdm
+from datetime import timedelta, datetime, timezone
 from models.parsed_mft_record import ParsedMFTRecord
 from helpers.tools import Utils
 from display.dhandler import Display
@@ -49,6 +50,7 @@ class MFTParser:
             parsed_record = self.parse_flags(record,parsed_record)
             parsed_record = self.parse_standard_info(record,parsed_record)
             parsed_record = self.parse_file_name_info(record,parsed_record)
+            parsed_record.timestomping_analysis = self.parse_timestomping_analysis(parsed_record)
             if not parsed_record._file_name_short and not parsed_record._file_name_large:
                 raise ValueError(
                     f"MFT entry {parsed_record.entry_number}: "
@@ -276,5 +278,75 @@ class MFTParser:
             # Update progress bar
             progress_bar.update(1)    
         progress_bar.set_postfix_str(Display.print_color_text("Done",Display.GREEN), refresh=True)
-        progress_bar.close()         
-            
+        progress_bar.close()        
+
+    def parse_timestomping_analysis(self, parsed_record : ParsedMFTRecord) -> dict:
+        MAX_SCORE = 15
+        THRESHOLD = timedelta(seconds=2)
+
+        result = {
+            "internal_inconsistency": False,
+            "mismatch_fields": [],
+            "rounded_timestamp": False,
+            "future_timestamp": False,
+            "score": 0
+        }
+
+        # Get values from dict
+        si_c = parsed_record.standard_info_creation     # .get("0x10Creation")
+        si_m = parsed_record.standard_info_modification # si.get("0x10Modification")
+        si_e = parsed_record.standard_info_mft_modification # si.get("0x10MFTModification")
+        si_a = parsed_record.standard_info_access # si.get("0x10Access")
+
+        fi_c = parsed_record.file_name_creation # fi.get("0x30Creation")
+        fi_m = parsed_record.file_name_modification # fi.get("0x30Modification")
+        fi_e = parsed_record.file_name_mft_modification # fi.get("0x30MFTModification")
+        fi_a = parsed_record.file_name_access # fi.get("0x30Access")
+
+        # Step 1. coherence
+        if si_c and si_m and si_c > si_m:
+            result["internal_inconsistency"] = True
+            result["score"] += 2
+        
+        if si_m and si_e and si_m > si_e:
+            result["internal_inconsistency"] = True
+            result["score"] += 2    
+
+        # Step 2. SI vs FI
+        comparisons = [
+            (si_c, fi_c, "Creation"),
+            (si_m, fi_m, "Modification"),
+            (si_e, fi_e, "MFTModification"),
+            (si_a, fi_a, "Access"),
+        ]
+
+        mismatches = 0
+
+        for si_val, fi_val, name in comparisons:
+            if si_val and fi_val:
+                delta = abs(si_val - fi_val)
+                if delta > THRESHOLD:
+                    mismatches += 1
+                    result["mismatch_fields"].append(name)
+
+        if mismatches > 0:
+            result["score"] += mismatches * 2
+
+        # Step 3. Rounded UTC 0    
+        if si_c and si_c.microsecond == 0:
+            result["rounded_timestamp"] = True
+            result["score"] += 1
+
+        # Step 4
+        if si_c:
+            si_c_utc = si_c.replace(tzinfo=timezone.utc)
+            now = datetime.now(timezone.utc)
+            if si_c_utc > now:
+                result["future_timestamp"] = True
+                result["score"] += 2   
+
+        # Step 5. Normalized score 100%
+        normalized_score = round((result["score"] / MAX_SCORE) * 100, 2)
+        result["score"] = normalized_score
+
+        return result

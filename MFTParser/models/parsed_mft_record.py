@@ -1,3 +1,4 @@
+import json
 class ParsedMFTRecord:
     
     ATTR_STANDARD_INFORMATION = 0x10
@@ -27,6 +28,7 @@ class ParsedMFTRecord:
         self._0x30Modification = None
         self._0x30MFTModification = None
         self._0x30Access = None
+        self._timestomping_analysis = None
 
     # --- Identifiers ---
     @property
@@ -210,6 +212,21 @@ class ParsedMFTRecord:
     def file_name_access(self, value):
         self._0x30Access = value
 
+    # --- Timestomping Analysis ---    
+    @property
+    def timestomping_analysis(self):
+        return self._timestomping_analysis
+
+    @timestomping_analysis.setter
+    def timestomping_analysis(self, value):
+        self._timestomping_analysis = value
+    
+    @property
+    def timestomping_score(self):
+        if self._timestomping_analysis is None:
+            return 0.0
+        return self._timestomping_analysis.get('score', 0.0)    
+
     def to_dict(self):
         return {
             "entry_number": self._entry_number,
@@ -234,6 +251,7 @@ class ParsedMFTRecord:
             "0x30Modification": self._0x30Modification,
             "0x30MFTModification": self._0x30MFTModification,
             "0x30Access": self._0x30Access,
+            "timestomping_analysis" : json.dumps(self._timestomping_analysis)
         }    
 
     def __str__(self):
@@ -259,5 +277,6 @@ class ParsedMFTRecord:
             f"_0x30Creation={self._0x30Creation}, "
             f"_0x30Modification={self._0x30Modification}, "
             f"_0x30MFTModification={self._0x30MFTModification}, "
-            f"_0x30Access={self._0x30Access})"
+            f"_0x30Access={self._0x30Access}, "
+            f"timestomping_analysis={self._timestomping_analysis})"
         )    
