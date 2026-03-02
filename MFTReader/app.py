@@ -28,9 +28,14 @@ def main():
             record
         )
         
-        # build (& SHOW) record structure info    
+        # Builds attrs    
         mft_reader.build_record_struct()
-        Display.show_structure_table(mft_reader.record_structure_list) # [TODO] CHECK -struture param to build and show
+        mft_reader.build_standard_info() 
+        mft_reader.build_file_name_info()
+        mft_reader.build_general_info()
         
-        #mft_reader.build_attributes()
-
+        # Displays
+        Display.show_structure_table(mft_reader.record_structure_list) # record structure info
+        Display.show_general_info_table(mft_reader.get_general_info())
+        Display.show_standard_info_table(mft_reader.get_standard_info())
+        Display.show_file_info_table(mft_reader.get_filename_info())
