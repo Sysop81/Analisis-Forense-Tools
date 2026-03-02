@@ -120,7 +120,7 @@ class Display:
         # Title
         Display.build_table_title("GENERAL_INFORMATION")
         
-        # # Header
+        # Header
         clean_header = Display.build_table_header({
             'ATTRIBUTE' : 24,
             'DATA' : 53
@@ -128,6 +128,19 @@ class Display:
 
         # body
         Display.build_table_body(g_info,clean_header)
+
+    @staticmethod
+    def show_flags(flags_info : dict) -> None:
+       
+        Display.build_table_title("FILE FLAGS")
+
+        clean_header = Display.build_table_header({
+            'ATTRIBUTE' : 24,
+            'DATA' : 53
+        })
+
+        Display.build_table_body(flags_info,clean_header)
+
 
     @staticmethod
     def show_standard_info_table(st_info : dict) -> None:
@@ -164,9 +177,18 @@ class Display:
         left : str = Display.CROSS_LEFT
         rigth : str = Display.CROSS_RIGTH
         parent_horizontal = Display.CROSS
+        formatted_value : str
         for index, (key,value) in enumerate(data.items()):
+            # TODO CHECK THIS
+            if value == 'False':
+                formatted_value = f"{Display.RED}{value:<52}{Display.RESET}"
+            elif value == 'True':
+                formatted_value = f"{Display.GREEN}{value:<52}{Display.RESET}"
+            else:
+                formatted_value =  f"{value:<52}"
+            
             print(f"\t{Display.VERTICAL}{Display.GREY}{key:<25}{Display.RESET}" 
-                  f"{Display.VERTICAL} {value:<52} {Display.VERTICAL}"
+                  f"{Display.VERTICAL} {formatted_value} {Display.VERTICAL}"
             )
 
             Display.build_table_row_line(

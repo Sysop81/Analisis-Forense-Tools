@@ -73,6 +73,15 @@ class MFTReader:
             'FileNameLarge': self.parsed_record.file_name_large
         }    
     
+    def get_file_flags(self)->dict:
+        return {
+            'IsDirectory' : str(bool(self._parsed_record.IsDirectory)),
+            'IsHidden'    : str(bool(self._parsed_record.IsHidden)),
+            'IsSystem'    : str(bool(self._parsed_record.IsSystem)),
+            'IsReadOnly'  : str(bool(self._parsed_record.IsReadOnly))  
+        }
+
+        
     # def build_attributes(self) -> None:
     #     pass
 
@@ -90,6 +99,14 @@ class MFTReader:
         self._parsed_record.mft_reference = (self._parsed_record.sequence_number << self._SEQUENCE_NUMBER_SHIFT) | int(self._entry_number)
         
         # Flags
+
+    def build_file_flags(self):
+        flags = struct.unpack_from("<H", self._record, self._FLAGS_OFFSET)[0]
+
+        self._parsed_record.IsDirectory = bool(flags & 0x0002)    # Bit 1 directory
+        self._parsed_record.IsHidden = bool(flags & 0x0004)       # Bit 2 hidden
+        self._parsed_record.IsSystem = bool(flags & 0x0008)       # Bit 3 System file
+        self._parsed_record.IsReadOnly = bool(flags & 0x0001)     # Bit 0 Read only
 
     def build_record_struct(self):
         
@@ -243,6 +260,44 @@ class MFTReader:
             if index < len(namespaceslist) - 1:
                 self._parsed_record.name_type += " | "
 
+    def build_ads_files(self):
+        # TODO COMPLETE THIS
+        pass
+
+    def build_data_info(self):
+        data = {
+            "ads_files" : [],
+            "IsADS":False
+        }
+        
+        offset = self._INFORMATION_ATTR_OFFSET
+        
+        while offset < len(self._record):
+            attr_type = struct.unpack_from("<I", self._record, offset)[0]
+            if attr_type == 0xFFFFFFFF:
+                break
+            attr_length = struct.unpack_from("<I", self._record, offset + 4)[0]
+            
+            if attr_type == ParsedMFTRecord.ATTR_DATA:
+                
+                # Get stream name
+                name_length = struct.unpack_from("<B", self._record, offset + 9)[0]
+                if name_length > 0:
+                    name_bytes = self._record[offset + 0x40 : offset + 0x40 + name_length*2]
+                    try:
+                        name = name_bytes.decode("utf-16le")
+                        data["ads_files"].append(Utils.clean_string(name))
+                        # This code is for MFTPrse app. now is checking without clean characteres
+                        # if not Utils.has_non_printable_chars(name): 
+                        #     data["ads_files"].append(Utils.clean_string(name))
+                    except:
+                        name = "<error decoding stream name>"
+                # else:
+                #     name = "(MAIN STREAM)"
+            offset += attr_length
+
+        self._parsed_record.IsADS = len(data["ads_files"]) > 0
+        self.parsed_record.ADSFiles = ",".join(data["ads_files"])    
 
 
     # @property
