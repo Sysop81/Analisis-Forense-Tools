@@ -116,80 +116,51 @@ class Display:
             )   
 
     @staticmethod
-    def show_general_info_table(g_info : dict) -> None:
+    def show_default_info_table(g_info : dict, title : str = "INFO") -> None:
         # Title
-        Display.build_table_title("GENERAL_INFORMATION")
+        Display.build_table_title(title)
         
         # Header
         clean_header = Display.build_table_header({
             'ATTRIBUTE' : 24,
             'DATA' : 53
         })
-
+        
         # body
         Display.build_table_body(g_info,clean_header)
 
     @staticmethod
-    def show_flags(flags_info : dict) -> None:
-       
-        Display.build_table_title("FILE FLAGS")
-
-        clean_header = Display.build_table_header({
-            'ATTRIBUTE' : 24,
-            'DATA' : 53
-        })
-
-        Display.build_table_body(flags_info,clean_header)
-
-
-    @staticmethod
-    def show_standard_info_table(st_info : dict) -> None:
-        
-        # Title
-        Display.build_table_title("STANDARD_INFORMATION")
-        
-        # # Header
-        clean_header = Display.build_table_header({
-            'ATTRIBUTE' : 24,
-            'DATA' : 53
-        })
-
-        # body
-        Display.build_table_body(st_info,clean_header)
-
-    @staticmethod
-    def show_file_info_table(f_info : dict) -> None:
-        # Title
-        Display.build_table_title("FILE_NAME")
-        
-        # # Header
-        clean_header = Display.build_table_header({
-            'ATTRIBUTE' : 24,
-            'DATA' : 53
-        })
-
-        # # body
-        Display.build_table_body(f_info,clean_header)
-
-    @staticmethod
     def build_table_body(data : dict,clean_header : str)->None:
+        
         # body
         left : str = Display.CROSS_LEFT
         rigth : str = Display.CROSS_RIGTH
         parent_horizontal = Display.CROSS
         formatted_value : str
         for index, (key,value) in enumerate(data.items()):
-            # TODO CHECK THIS
+            # TODO REFACT THIS
+            value = str(value)
+            value = value.replace("\n", "").replace("\r", "")
             if value == 'False':
                 formatted_value = f"{Display.RED}{value:<52}{Display.RESET}"
             elif value == 'True':
                 formatted_value = f"{Display.GREEN}{value:<52}{Display.RESET}"
             else:
                 formatted_value =  f"{value:<52}"
-            
-            print(f"\t{Display.VERTICAL}{Display.GREY}{key:<25}{Display.RESET}" 
-                  f"{Display.VERTICAL} {formatted_value} {Display.VERTICAL}"
-            )
+            max_len = 52
+            if len(value) > max_len:
+                chunks = [value[i:i+max_len] for i in range(0, len(value), max_len)]
+                for i, val in enumerate(chunks):
+                    if i == 0:
+                        print(f"\t{Display.VERTICAL}{Display.GREY}{key:<25}{Display.RESET}" 
+                        f"{Display.VERTICAL} {val:<52} {Display.VERTICAL}")
+                    else:
+                        print(f"\t{Display.VERTICAL}{Display.GREY}{'':<25}{Display.RESET}" 
+                                                f"{Display.VERTICAL} {val:<52} {Display.VERTICAL}")
+            else:
+                print(f"\t{Display.VERTICAL}{Display.GREY}{key:<25}{Display.RESET}" 
+                    f"{Display.VERTICAL} {formatted_value} {Display.VERTICAL}"
+                )
 
             Display.build_table_row_line(
                 index=index,
