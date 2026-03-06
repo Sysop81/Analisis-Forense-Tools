@@ -207,16 +207,19 @@ class MFTParser:
                 
                 # Get stream name
                 name_length = struct.unpack_from("<B", record, offset + 9)[0]
+                name_offset = struct.unpack_from("<H", record, offset + 10)[0]
                 if name_length > 0:
-                    name_bytes = record[offset + 0x40 : offset + 0x40 + name_length*2]
+                    name_start = offset + name_offset
+                    name_end = name_start + name_length * 2
+                    name_bytes = record[name_start:name_end]
+                    
                     try:
                         name = name_bytes.decode("utf-16le")
                         if not Utils.has_non_printable_chars(name): 
                             data["ads_files"].append(Utils.clean_string(name))
                     except:
-                        name = "<error decoding stream name>"
-                # else:
-                #     name = "(MAIN STREAM)"
+                        pass
+    
             offset += attr_length
 
         parse_record.IsADS = len(data["ads_files"]) > 0
