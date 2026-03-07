@@ -14,8 +14,6 @@ def main():
     Display.show_banner()
     params = Parameters()
 
-    #print(f"input: {params.get_input()}, entry_number : {params.get_entry_number()}")
-
     MFT_RECORD_SIZE = 1024
     with open(params.get_input(), "rb") as f:
         # Set cursor in the offset record [entry point] and get the target MFT record
@@ -37,16 +35,11 @@ def main():
         mft_reader.build_file_flags()
 
         # MENU. TODO REFACT THIS
-        _exit = False
+        _exit : bool = False
+        _show_banners : bool = False
         while not _exit:
-            print("1. Show Record Structure")
-            print("2. Show General Information")   
-            print("3. Show Standard Information")  
-            print("4. Show File Name Information")   
-            print("5. Show Data Information")
-            print("6. Exit")
             
-            user_entry = input("Please, select an option: ")
+            user_entry =  Display.show_options_menu(_show_banners)
             msg : str = ''
             is_error : bool = False
             try:
@@ -59,53 +52,35 @@ def main():
                 is_error = True 
             
             if is_error:
-                print(msg)
-                input("Press ENTER to continue")
-                os.system('cls' if os.name == 'nt' else 'clear')
-                continue 
-
-            match user_entry:
-                case 1:
-                    # Record MFT Structure
-                    Display.show_structure_table(mft_reader.record_structure_list)
-                case 2:
-                    # General Record information && Flags
-                    Display.show_default_info_table(mft_reader.get_general_info(),"GENERAL_INFORMATION")
-                    Display.show_default_info_table(mft_reader.get_file_flags(),"FILE FLAGS")
-                case 3:
-                    # Standard Information
-                    Display.show_default_info_table(mft_reader.get_standard_info(),"STANDARD_INFORMATION")
-                case 4:
-                    # File Name Information
-                    fn_list = mft_reader.file_name_attr_list
-                    for fn_info in fn_list:
-                        Display.show_default_info_table(fn_info.to_dict(),"FILE_NAME")
-                case 5:
-                    # Data Information
-                    data_list = mft_reader.data_attr_list
-                    for data_info in data_list:
-                        Display.show_default_info_table(data_info.to_dict(),"DATA_INFORMATION")
-                case 6:
-                    print("Program finished")
-                    _exit = True
+                Display.show_error(msg)
+            else:
+                match user_entry:
+                    case 1:
+                        # Record MFT Structure
+                        Display.show_structure_table(mft_reader.record_structure_list)
+                    case 2:
+                        # General Record information && Flags
+                        Display.show_default_info_table(mft_reader.get_general_info(),"GENERAL_INFORMATION")
+                        Display.show_default_info_table(mft_reader.get_file_flags(),"FILE FLAGS")
+                    case 3:
+                        # Standard Information
+                        Display.show_default_info_table(mft_reader.get_standard_info(),"STANDARD_INFORMATION")
+                    case 4:
+                        # File Name Information
+                        fn_list = mft_reader.file_name_attr_list
+                        for fn_info in fn_list:
+                            Display.show_default_info_table(fn_info.to_dict(),"FILE_NAME")
+                    case 5:
+                        # Data Information
+                        data_list = mft_reader.data_attr_list
+                        for data_info in data_list:
+                            Display.show_default_info_table(data_info.to_dict(),"DATA_INFORMATION")
+                    case 6:
+                        Display.show_end_program()
+                        _exit = True
             
             if not _exit:
-                input("Press ENTER to continue")
-                os.system('cls' if os.name == 'nt' else 'clear')
-        
-
-        # # Displays
-        # Display.show_structure_table(mft_reader.record_structure_list) # record structure info
-        # Display.show_default_info_table(mft_reader.get_general_info(),"GENERAL_INFORMATION")
-        # Display.show_default_info_table(mft_reader.get_file_flags(),"FILE FLAGS")
-        # Display.show_default_info_table(mft_reader.get_standard_info(),"STANDARD_INFORMATION")
-
-        # fn_list = mft_reader.file_name_attr_list
-        # for fn_info in fn_list:
-        #     Display.show_default_info_table(fn_info.to_dict(),"FILE_NAME")
-
-        # data_list = mft_reader.data_attr_list
-        # for data_info in data_list:
-        #      Display.show_default_info_table(data_info.to_dict(),"DATA_INFORMATION")
+                if not _show_banners : _show_banners = True
+                Display.show_user_action()
         
         

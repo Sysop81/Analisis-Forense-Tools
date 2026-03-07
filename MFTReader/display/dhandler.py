@@ -1,4 +1,5 @@
 import pyfiglet
+import os
 from colorama import init, Fore, Style
 from models.mft_record_struct import MFTRecordStruct
 
@@ -38,8 +39,8 @@ class Display:
     TITLE_SIZE = 25        
 
     @staticmethod
-    def show_banner():
-        init()
+    def show_banner(launch_init : bool = True):
+        if launch_init : init()
         print(f"{Display.GREEN}{(pyfiglet.figlet_format(Display.PROGRAM_NAME, font="doom")).strip()}{Display.RESET}")
         Display.show_description()
 
@@ -49,6 +50,26 @@ class Display:
         print(Display.print_color_text(f"Author : {Display.AUTHOR}",Display.GREY))
         print(Display.print_color_text(f"GitHub : {Display.GITHUB}",Display.GREY))
         print(Display.print_color_text(f"{Display.DESCRIPTION}\n",Display.GREY))
+
+    @staticmethod
+    def show_options_menu(show_banners : bool = True) -> str: 
+        
+        if show_banners: Display.show_banner(False)
+
+        print(f"{Display.YELLOW}MFTReader options menu{Display.RESET}")
+        print(f"\t{Display.GREEN}1.{Display.RESET} {Display.GREY}Show Record Structure.{Display.RESET}")
+        print(f"\t{Display.GREEN}2.{Display.RESET} {Display.GREY}Show General Information.{Display.RESET}")   
+        print(f"\t{Display.GREEN}3.{Display.RESET} {Display.GREY}Show Standard Information.{Display.RESET}")  
+        print(f"\t{Display.GREEN}4.{Display.RESET} {Display.GREY}Show File Name Information.{Display.RESET}")   
+        print(f"\t{Display.GREEN}5.{Display.RESET} {Display.GREY}Show Data Information.{Display.RESET}")
+        print(f"\t{Display.GREY}6.{Display.RESET} {Display.RED}Exit.{Display.RESET}")   
+
+        return input("Please, select an option: ") 
+    
+    @staticmethod
+    def show_user_action():
+        input(f"{Display.GREY}Press{Display.RESET} {Display.RED}ENTER{Display.RESET}{Display.GREY} to continue{Display.RESET}")
+        os.system('cls' if os.name == 'nt' else 'clear')
 
     @staticmethod
     def show_info(text):
